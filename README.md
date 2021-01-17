@@ -12,7 +12,7 @@ worker - Does regular processing of statistics and sends status e-mails for non-
 ```
 API listens on port 8001, remoteShare listens on 8000
 
-moneroocean.stream (The reference implementation) uses the following setup:  
+The reference implementation uses the following setup:  
 * https://moneroocean.stream is hosted on its own server, as the main website is a static frontend
 * https://api.moneroocean.stream hosts api, remoteShare, longRunner, payments, blockManager, worker, as these must all be hosted with access to the same LMDB database.
 
@@ -40,6 +40,9 @@ Server Requirements
 
 Pre-Deploy
 ----------
+INSTALL Prerequisites
+apt-get -y install libcap2-bin git python-virtualenv python3-virtualenv curl ntp build-essential screen cmake pkg-config libboost-all-dev libevent-dev libunbound-dev libminiupnpc-dev libunwind8-dev liblzma-dev libldns-dev libexpat1-dev mysql-server lmdb-utils libzmq3-dev libsodium-dev
+
 * If you're planning on using e-mail, you'll want to setup an account at https://mailgun.com (It's free for 10k e-mails/month!), so you can notify miners.  This also serves as the backend for password reset emails, along with other sorts of e-mails from the pool, including pool startup, pool Monerod daemon lags, etc so it's highly suggested!
 * Pre-Generate the wallets, or don't, it's up to you!  You'll need the addresses after the install is complete, so I'd suggest making sure you have them available.  Information on suggested setups are found below.
 * If you're going to be offering PPS, PLEASE make sure you load the pool wallet with XMR before you get too far along.  Your pool will trigger PPS payments on its own, and fairly readily, so you need some float in there!
