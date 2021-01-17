@@ -16,7 +16,7 @@ sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again p
 echo -e "[client]\nuser=root\npassword=$ROOT_SQL_PASS" | sudo tee /root/.my.cnf
 sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcap2-bin git python-virtualenv python3-virtualenv curl ntp build-essential screen cmake pkg-config libboost-all-dev libevent-dev libunbound-dev libminiupnpc-dev libunwind8-dev liblzma-dev libldns-dev libexpat1-dev mysql-server lmdb-utils libzmq3-dev libsodium-dev
 cd ~
-git clone https://github.com/MoneroOcean/nodejs-pool.git
+git clone https://github.com/blackrangersoftware/brs-nodejs-pool.git
 sudo systemctl enable ntp
 cd /usr/local/src
 sudo git clone --recursive https://github.com/monero-project/monero.git
