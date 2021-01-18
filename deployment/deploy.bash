@@ -47,7 +47,7 @@ npm install
 cd build
 sudo ln -s `pwd` /var/www
 ls
-curl -sL "https://github.com/caddyserver/dist/archive/master.zip" | tar -xz caddy init/linux-systemd/caddy.service
+curl -sL "https://github.com/blackrangersoftware/caddy/blob/master/caddyserver-binary.tar.gz" | tar -xz caddy init/linux-systemd/caddy.service
 sudo mv caddy /usr/local/bin
 sudo chown root:root /usr/local/bin/caddy
 sudo chmod 755 /usr/local/bin/caddy
@@ -75,9 +75,9 @@ cd ~/brs-nodejs-pool
 sudo chown -R $CURUSER /home/pooldaemon/.nvm/versions/node/v8.11.3/lib/node_modules/pm2/bin/pm2
 echo "Installing pm2-logrotate in the background!"
 /home/pooldaemon/.nvm/versions/node/v8.11.3/lib/node_modules/pm2/bin/pm2 install pm2-logrotate &
-mysql -u root --password=FLUXWXFL02D3XAHPD8CyuyMiD6JBoXPt < deployment/base.sql
-mysql -u root --password=FLUXWXFL02D3XAHPD8CyuyMiD6JBoXPt pool -e "INSERT INTO pool.config (module, item, item_value, item_type, Item_desc) VALUES ('api', 'authKey', '`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`', 'string', 'Auth key sent with all Websocket frames for validation.')"
-mysql -u root --password=FLUXWXFL02D3XAHPD8CyuyMiD6JBoXPt pool -e "INSERT INTO pool.config (module, item, item_value, item_type, Item_desc) VALUES ('api', 'secKey', '`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`', 'string', 'HMAC key for Passwords.  JWT Secret Key.  Changing this will invalidate all current logins.')"
+mysql -u root --password=$ROOT_SQL_PASS < deployment/base.sql
+mysql -u root --password=$ROOT_SQL_PASS pool -e "INSERT INTO pool.config (module, item, item_value, item_type, Item_desc) VALUES ('api', 'authKey', '`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`', 'string', 'Auth key sent with all Websocket frames for validation.')"
+mysql -u root --password=$ROOT_SQL_PASS pool -e "INSERT INTO pool.config (module, item, item_value, item_type, Item_desc) VALUES ('api', 'secKey', '`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`', 'string', 'HMAC key for Passwords.  JWT Secret Key.  Changing this will invalidate all current logins.')"
 pm2 start init.js --name=api --log-date-format="YYYY-MM-DD HH:mm Z" -- --module=api
-bash ~/nodejs-pool/deployment/install_lmdb_tools.sh
+bash ~/brs-nodejs-pool/deployment/install_lmdb_tools.sh
 echo "You're setup!  Please read the rest of the readme for the remainder of your setup and configuration.  These steps include: Setting your Fee Address, Pool Address, Global Domain, and the Mailgun setup!"
