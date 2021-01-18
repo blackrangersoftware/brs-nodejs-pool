@@ -6,15 +6,11 @@ if [[ `whoami` == "root" ]]; then
     echo "You ran me as root! Do not run me as root!"
     exit 1
 fi
-ROOT_SQL_PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 CURUSER=$(whoami)
 sudo timedatectl set-timezone Etc/UTC
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
-sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password $ROOT_SQL_PASS"
-sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $ROOT_SQL_PASS"
-echo -e "[client]\nuser=root\npassword=$ROOT_SQL_PASS" | sudo tee /root/.my.cnf
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y install libcap2-bin git python3-virtualenv curl ntp build-essential screen cmake pkg-config libboost-all-dev libevent-dev libunbound-dev libminiupnpc-dev libunwind8-dev liblzma-dev libldns-dev libexpat1-dev mysql-server lmdb-utils libzmq3-dev libsodium-dev
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y install nodejs python libcap2-bin git python3-virtualenv curl ntp build-essential screen cmake pkg-config libboost-all-dev libevent-dev libunbound-dev libminiupnpc-dev libunwind8-dev liblzma-dev libldns-dev libexpat1-dev mysql-server lmdb-utils libzmq3-dev libsodium-dev
 cd ~
 git clone https://github.com/blackrangersoftware/brs-nodejs-pool.git
 sudo systemctl enable ntp
