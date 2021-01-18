@@ -46,9 +46,8 @@ npm install
 ./node_modules/gulp/bin/gulp.js build
 cd build
 sudo ln -s `pwd` /var/www
-CADDY_DOWNLOAD_DIR=$(mktemp -d)
-cd $CADDY_DOWNLOAD_DIR
-curl -sL "https://snipanet.com/caddy.tar.gz" | tar -xz caddy init/linux-systemd/caddy.service
+ls
+curl -sL "https://github.com/caddyserver/dist/archive/master.zip" | tar -xz caddy init/linux-systemd/caddy.service
 sudo mv caddy /usr/local/bin
 sudo chown root:root /usr/local/bin/caddy
 sudo chmod 755 /usr/local/bin/caddy
@@ -60,10 +59,10 @@ sudo chown -R root:www-data /etc/caddy
 sudo mkdir /etc/ssl/caddy
 sudo chown -R www-data:root /etc/ssl/caddy
 sudo chmod 0770 /etc/ssl/caddy
-sudo cp ~/nodejs-pool/deployment/caddyfile /etc/caddy/Caddyfile
+sudo cp ~/brs-nodejs-pool/deployment/caddyfile /etc/caddy/Caddyfile
 sudo chown www-data:www-data /etc/caddy/Caddyfile
 sudo chmod 444 /etc/caddy/Caddyfile
-sudo sh -c "sed 's/ProtectHome=true/ProtectHome=false/' init/linux-systemd/caddy.service > /etc/systemd/system/caddy.service"
+sudo sh -c "sed 's/ProtectHome=true/ProtectHome=false/' init/caddy.service > /etc/systemd/system/caddy.service"
 sudo chown root:root /etc/systemd/system/caddy.service
 sudo chmod 644 /etc/systemd/system/caddy.service
 sudo systemctl daemon-reload
@@ -72,13 +71,13 @@ sudo systemctl start caddy.service
 rm -rf $CADDY_DOWNLOAD_DIR
 cd ~
 sudo env PATH=$PATH:`pwd`/.nvm/versions/node/v8.11.3/bin `pwd`/.nvm/versions/node/v8.11.3/lib/node_modules/pm2/bin/pm2 startup systemd -u $CURUSER --hp `pwd`
-cd ~/nodejs-pool
-sudo chown -R $CURUSER ~/.pm2
+cd ~/brs-nodejs-pool
+sudo chown -R $CURUSER /home/pooldaemon/.nvm/versions/node/v8.11.3/lib/node_modules/pm2/bin/pm2
 echo "Installing pm2-logrotate in the background!"
-pm2 install pm2-logrotate &
-mysql -u root --password=$ROOT_SQL_PASS < deployment/base.sql
-mysql -u root --password=$ROOT_SQL_PASS pool -e "INSERT INTO pool.config (module, item, item_value, item_type, Item_desc) VALUES ('api', 'authKey', '`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`', 'string', 'Auth key sent with all Websocket frames for validation.')"
-mysql -u root --password=$ROOT_SQL_PASS pool -e "INSERT INTO pool.config (module, item, item_value, item_type, Item_desc) VALUES ('api', 'secKey', '`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`', 'string', 'HMAC key for Passwords.  JWT Secret Key.  Changing this will invalidate all current logins.')"
+/home/pooldaemon/.nvm/versions/node/v8.11.3/lib/node_modules/pm2/bin/pm2 install pm2-logrotate &
+mysql -u root --password=FLUXWXFL02D3XAHPD8CyuyMiD6JBoXPt < deployment/base.sql
+mysql -u root --password=FLUXWXFL02D3XAHPD8CyuyMiD6JBoXPt pool -e "INSERT INTO pool.config (module, item, item_value, item_type, Item_desc) VALUES ('api', 'authKey', '`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`', 'string', 'Auth key sent with all Websocket frames for validation.')"
+mysql -u root --password=FLUXWXFL02D3XAHPD8CyuyMiD6JBoXPt pool -e "INSERT INTO pool.config (module, item, item_value, item_type, Item_desc) VALUES ('api', 'secKey', '`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`', 'string', 'HMAC key for Passwords.  JWT Secret Key.  Changing this will invalidate all current logins.')"
 pm2 start init.js --name=api --log-date-format="YYYY-MM-DD HH:mm Z" -- --module=api
 bash ~/nodejs-pool/deployment/install_lmdb_tools.sh
 echo "You're setup!  Please read the rest of the readme for the remainder of your setup and configuration.  These steps include: Setting your Fee Address, Pool Address, Global Domain, and the Mailgun setup!"
