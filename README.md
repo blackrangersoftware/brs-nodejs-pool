@@ -43,6 +43,27 @@ Pre-Deploy
 INSTALL Prerequisites
 apt-get -y install libcap2-bin git python-virtualenv python3-virtualenv curl ntp build-essential screen cmake pkg-config libboost-all-dev libevent-dev libunbound-dev libminiupnpc-dev libunwind8-dev liblzma-dev libldns-dev libexpat1-dev mysql-server lmdb-utils libzmq3-dev libsodium-dev
 
+free -m
+rm /swapfile
+dd if=/dev/zero of=/swapfile bs=1024 count=10240000
+ls -al /
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile | free -m
+
+nano /etc/fstab
+add this:
+/swapfile swap swap defaults 0 0
+
+sysctl vm.swappiness=10
+sysctl vm.vfs_cache_pressure=50
+nano /etc/sysctl.conf
+
+add this:
+vm.swappiness=10
+vm.vfs_cache_pressure=50
+
+
 * If you're planning on using e-mail, you'll want to setup an account at https://mailgun.com (It's free for 10k e-mails/month!), so you can notify miners.  This also serves as the backend for password reset emails, along with other sorts of e-mails from the pool, including pool startup, pool Monerod daemon lags, etc so it's highly suggested!
 * Pre-Generate the wallets, or don't, it's up to you!  You'll need the addresses after the install is complete, so I'd suggest making sure you have them available.  Information on suggested setups are found below.
 * If you're going to be offering PPS, PLEASE make sure you load the pool wallet with XMR before you get too far along.  Your pool will trigger PPS payments on its own, and fairly readily, so you need some float in there!
@@ -52,12 +73,19 @@ Deployment via Installer
 ------------------------
 
 1. Add your user to `/etc/sudoers`, this must be done so the script can sudo up and do it's job.  We suggest passwordless sudo.  Suggested line: `<USER> ALL=(ALL) NOPASSWD:ALL`.  Our sample builds use: `pooldaemon ALL=(ALL) NOPASSWD:ALL`
+
 2. Run the [deploy script](https://raw.githubusercontent.com/blackrangersoftware/brs-nodejs-pool/master/deployment/deploy.bash) as a **NON-ROOT USER**.  This is very important!  This script will install the pool to whatever user it's running under!  Also.  Go get a coffee, this sucker bootstraps the monero installation.
+
 3. Once it's complete, change as `config.json` appropriate.  It is pre-loaded for a local install of everything, running on 127.0.0.1.  This will work perfectly fine if you're using a single node setup.  You'll also want to set `bind_ip` to the external IP of the pool server, and `hostname` to the resolvable hostname for the pool server. `pool_id` is mostly used for multi-server installations to provide unique identifiers in the backend. You will also want to run: source ~/.bashrc  This will activate NVM and get things working for the following pm2 steps.
+
 4. You'll need to change the API endpoint for the frontend code in the `poolui/build/globals.js` and `poolui/build/globals.default.js` -- This will usually be `http(s)://<your server FQDN>/api` unless you tweak caddy!
+
 5. The default database directory `/home/<username>/pool_db/` is already been created during startup. If you change the `db_storage_path` just make sure your user has write permissions for new path. Run: `pm2 restart api` to reload the API for usage.  
+
 6. Hop into the web interface (Should be at `http://<your server IP>/admin.html`), then login with `Administrator/Password123`, **MAKE SURE TO CHANGE THIS PASSWORD ONCE YOU LOGIN**. *<- This step is currently not active, we're waiting for the frontend to catch up!  Head down to the Manual SQL Configuration to take a look at what needs to be done by hand for now*.
+
 7. From the admin panel, you can configure all of your pool's settings for addresses, payment thresholds, etc.
+
 8. Once you're happy with the settings, go ahead and start all the pool daemons, commands follow.
 
 ```shell
@@ -102,10 +130,15 @@ Wallet Setup
 The pool is designed to have a dual-wallet design, one which is a fee wallet, one which is the live pool wallet.  The fee wallet is the default target for all fees owed to the pool owner.  PM2 can also manage your wallet daemon, and that is the suggested run state.
 
 1. Generate your wallets using `/usr/local/src/monero/build/release/bin/monero-wallet-cli`
+
 2. Make sure to save your regeneration stuff!
+
 3. For the pool wallet, store the password in a file, the suggestion is `~/wallet_pass`
+
 4. Change the mode of the file with chmod to 0400: `chmod 0400 ~/wallet_pass`
+
 5. Start the wallet using PM2: `pm2 start /usr/local/src/monero/build/release/bin/monero-wallet-rpc -- --rpc-bind-port 18082 --password-file ~/wallet_pass --wallet-file <Your wallet name here> --disable-rpc-login --trusted-daemon`
+
 6. If you don't use PM2, then throw the wallet into a screen and have fun.
 
 Manual Setup
@@ -129,9 +162,15 @@ general/emailFrom
 SQL import command: sudo mysql pool < ~/nodejs-pool/sample_config.sql (Adjust name/path as needed!)
 ```
 
-The shareHost configuration is designed to be pointed at wherever the leafApi endpoint exists.  For moneroocean.stream, we use https://api.moneroocean.stream/leafApi.  If you're using the automated setup script, you can use: `http://<your IP>/leafApi`, as Caddy will proxy it.  If you're just using localhost and a local pool serv, http://127.0.0.1:8000/leafApi will do you quite nicely
+The shareHost configuration is designed to be pointed at wherever the leafApi endpoint exists.
+For moneroocean.stream, we use https://api.moneroocean.stream/leafApi.
 
-Additional ports can be added as desired, samples can be found at the end of base.sql.  If you're not comfortable with the MySQL command line, I highly suggest MySQL Workbench or a similar piece of software (I use datagrip!).  Your root MySQL password can be found in `/root/.my.cnf`
+If you're using the automated setup script, you can use: `http://<your IP>/leafApi`, as Caddy will proxy it.
+If you're just using localhost and a local pool serv, http://127.0.0.1:8000/leafApi will do you quite nicely
+
+Additional ports can be added as desired, samples can be found at the end of base.sql.
+
+If you're not comfortable with the MySQL command line, I highly suggest MySQL Workbench or a similar piece of software (I use datagrip!).  Your root MySQL password can be found in `/root/.my.cnf`
 
 Final Manual Steps
 ------------------
