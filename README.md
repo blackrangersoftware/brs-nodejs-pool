@@ -1,3 +1,5 @@
+WARNING: IF YOU HAVE FOUND THIS REPO, DON'T USE IT. IT IS A MESS AND DERIVED FROM THE 16.04 VERSION WITH A MYRIAD OF ERROS AND PROBLEMS. I WAS ONLY ABLE TO GET MY OWN VERSION RUNNING BY PERFORMING EACH STEP MANUALLY FROM THE CONTENTS I FORKED.
+==================
 Pool Design/Theory
 ==================
 The brs-nodejs-pool is built around a small series of core daemons that share access to a single LMDB table for tracking of shares, with MySQL being used to centralize configurations and ensure simple access from local/remote nodes.  The core daemons follow:
