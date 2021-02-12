@@ -1,8 +1,13 @@
-WARNING: IF YOU HAVE FOUND THIS REPO, DON'T USE IT. IT IS A MESS AND DERIVED FROM THE 16.04 VERSION WITH A MYRIAD OF ERROS AND PROBLEMS. I WAS ONLY ABLE TO GET MY OWN VERSION RUNNING BY PERFORMING EACH STEP MANUALLY FROM THE CONTENTS I FORKED.
+WARNING: IF YOU HAVE FOUND THIS REPO, DON'T USE IT. I have a working version now at:
+
+http://pool.co-op-ming.com
+
+IT IS A MESS AND DERIVED FROM THE 16.04 VERSION WITH A MYRIAD OF ERROS AND PROBLEMS. I WAS ONLY ABLE TO GET MY OWN VERSION RUNNING BY PERFORMING EACH STEP MANUALLY FROM THE CONTENTS I FORKED. EVERY COMPONENT PACKAGE HAD TO BE CUSTOM INSTALLED, RIGHT DOWN TO THE FINAL SQL COMMANDS AND MANUAL SQL INPUTS TO THE DATABASE.
+
 ==================
 Pool Design/Theory
 ==================
-The brs-nodejs-pool is built around a small series of core daemons that share access to a single LMDB table for tracking of shares, with MySQL being used to centralize configurations and ensure simple access from local/remote nodes.  The core daemons follow:
+The BRS-Nodejs-pool is built from nodejs-pool, which was built around a small series of core daemons that share access to a single LMDB table for tracking of shares, with MySQL being used to centralize configurations and ensure simple access from local/remote nodes.  The core daemons follow:
 ```text
 api - Main API for the frontend to use and pull data from.  Expects to be hosted at  /
 remoteShare - Main API for consuming shares from remote/local pools.  Expects to be hosted at /leafApi
